@@ -1,0 +1,381 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if action == 'create' %}Create Site{% else %}Edit Site{% endif %} - ProxiBase Admin{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+    }
+
+    .back-btn {
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+        background: var(--bg-tertiary);
+    }
+
+    .form-container {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        max-width: 900px;
+    }
+
+    .error-alert {
+        background: var(--danger-light);
+        color: var(--danger);
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--danger);
+        font-weight: 500;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .form-help {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-top: 0.25rem;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: var(--bg-secondary);
+        border-radius: 0.5rem;
+        border: 2px solid var(--border-color);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .checkbox-item:hover {
+        border-color: var(--accent-primary);
+        background: var(--accent-light);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--accent-primary);
+    }
+
+    .checkbox-item label {
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--border-color);
+    }
+
+    .radio-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-secondary);
+        border-radius: 0.5rem;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .radio-item:has(input:checked) {
+        border-color: var(--accent-primary);
+        background: var(--accent-light);
+    }
+
+    .radio-item input[type="radio"] {
+        cursor: pointer;
+        accent-color: var(--accent-primary);
+    }
+
+    .radio-item label {
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{% if action == 'create' %}➕ Create New Site{% else %}✏️ Edit Site{% endif %}</h1>
+    <a href="/admin/sites" class="back-btn">
+        <span>←</span>
+        <span>Back to Sites</span>
+    </a>
+</div>
+
+<div class="form-container">
+    {% if error %}
+    <div class="error-alert">
+        ⚠️ {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% if action == 'create' %}/admin/sites/create{% else %}/admin/sites/{{ site.id }}/edit{% endif %}">
+        <!-- Basic Configuration -->
+        <div class="form-section">
+            <h2 class="form-section-title">🎯 Basic Configuration</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mirror_root">Mirror Root Domain *</label>
+                    <input type="text" id="mirror_root" name="mirror_root" 
+                           value="{% if site %}{{ site.mirror_root }}{% endif %}" 
+                           placeholder="mirror.example.com" required>
+                    <div class="form-help">The domain that will mirror the source</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="source_root">Source Root Domain *</label>
+                    <input type="text" id="source_root" name="source_root" 
+                           value="{% if site %}{{ site.source_root }}{% endif %}" 
+                           placeholder="source.example.com" required>
+                    <div class="form-help">The original domain to proxy</div>
+                </div>
+            </div>
+
+            <div class="checkbox-item" style="width: fit-content;">
+                <input type="checkbox" id="enabled" name="enabled" value="true" 
+                       {% if not site or site.enabled %}checked{% endif %}>
+                <label for="enabled">✅ Site Enabled</label>
+            </div>
+        </div>
+
+        <!-- Proxy Settings -->
+        <div class="form-section">
+            <h2 class="form-section-title">🔗 Proxy Settings</h2>
+            <p class="form-help" style="margin-bottom: 1rem;">Leave unchecked to use global defaults</p>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="proxy_subdomains" name="proxy_subdomains" value="true"
+                           {% if site and site.proxy_subdomains %}checked{% endif %}>
+                    <label for="proxy_subdomains">Proxy Subdomains</label>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="proxy_external_domains" name="proxy_external_domains" value="true"
+                           {% if site and site.proxy_external_domains %}checked{% endif %}>
+                    <label for="proxy_external_domains">Proxy External Domains</label>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="rewrite_js_redirects" name="rewrite_js_redirects" value="true"
+                           {% if site and site.rewrite_js_redirects %}checked{% endif %}>
+                    <label for="rewrite_js_redirects">Rewrite JS Redirects</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Modification -->
+        <div class="form-section">
+            <h2 class="form-section-title">🎨 Content Modification</h2>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="remove_ads" name="remove_ads" value="true"
+                           {% if site and site.remove_ads %}checked{% endif %}>
+                    <label for="remove_ads">Remove Ads</label>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="inject_ads" name="inject_ads" value="true"
+                           {% if site and site.inject_ads %}checked{% endif %}>
+                    <label for="inject_ads">Inject Custom Ads</label>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="remove_analytics" name="remove_analytics" value="true"
+                           {% if site and site.remove_analytics %}checked{% endif %}>
+                    <label for="remove_analytics">Remove Analytics</label>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label for="custom_ad_html">Custom Ad HTML</label>
+                    <textarea id="custom_ad_html" name="custom_ad_html" placeholder="<div>Your ad code here</div>">{% if site and site.custom_ad_html %}{{ site.custom_ad_html }}{% endif %}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="custom_tracker_js">Custom Tracker JavaScript</label>
+                    <textarea id="custom_tracker_js" name="custom_tracker_js" placeholder="// Your tracking code here">{% if site and site.custom_tracker_js %}{{ site.custom_tracker_js }}{% endif %}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Settings -->
+        <div class="form-section">
+            <h2 class="form-section-title">⚙️ Advanced Settings</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="media_policy">Media Policy</label>
+                    <select id="media_policy" name="media_policy">
+                        <option value="">Use Global Default</option>
+                        <option value="bypass" {% if site and site.media_policy == 'bypass' %}selected{% endif %}>Bypass</option>
+                        <option value="proxy" {% if site and site.media_policy == 'proxy' %}selected{% endif %}>Proxy</option>
+                        <option value="size_limited" {% if site and site.media_policy == 'size_limited' %}selected{% endif %}>Size Limited</option>
+                    </select>
+                    <div class="form-help">How to handle media files (images, videos)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="session_mode">Session Mode</label>
+                    <select id="session_mode" name="session_mode">
+                        <option value="">Use Global Default</option>
+                        <option value="stateless" {% if site and site.session_mode == 'stateless' %}selected{% endif %}>Stateless</option>
+                        <option value="cookie_jar" {% if site and site.session_mode == 'cookie_jar' %}selected{% endif %}>Cookie Jar</option>
+                    </select>
+                    <div class="form-help">Session handling mode</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/admin/sites" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                {% if action == 'create' %}➕ Create Site{% else %}💾 Save Changes{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

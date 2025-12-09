@@ -1,0 +1,315 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Global Settings - ProxiBase Admin{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .page-description {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    .form-container {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        max-width: 900px;
+    }
+
+    .success-alert {
+        background: var(--success-light);
+        color: var(--success);
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--success);
+        font-weight: 500;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-help {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        margin-top: 0.25rem;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 0.5rem;
+        border: 2px solid var(--border-color);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .checkbox-item:hover {
+        border-color: var(--accent-primary);
+        background: var(--accent-light);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: var(--accent-primary);
+        margin-top: 0.125rem;
+    }
+
+    .checkbox-content {
+        flex: 1;
+    }
+
+    .checkbox-content label {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: block;
+        margin-bottom: 0.25rem;
+        color: var(--text-primary);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-family: inherit;
+    }
+
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: 'Monaco', 'Courier New', monospace;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--border-color);
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Global Settings</h1>
+    <p class="page-description">Configure default settings for all proxy sites. Individual sites can override these settings.</p>
+</div>
+
+<div class="form-container">
+    <form method="post" action="/admin/settings">
+        <!-- Proxy Settings -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <span>🔗</span>
+                <span>Proxy Defaults</span>
+            </h2>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="proxy_subdomains" name="proxy_subdomains" value="true"
+                           {% if config.proxy_subdomains %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="proxy_subdomains">Proxy Subdomains</label>
+                        <div class="form-help">Mirror all subdomains of the source</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="proxy_external_domains" name="proxy_external_domains" value="true"
+                           {% if config.proxy_external_domains %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="proxy_external_domains">Proxy External Domains</label>
+                        <div class="form-help">Proxy requests to external domains</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="rewrite_js_redirects" name="rewrite_js_redirects" value="true"
+                           {% if config.rewrite_js_redirects %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="rewrite_js_redirects">Rewrite JS Redirects</label>
+                        <div class="form-help">Rewrite JavaScript-based redirects</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Modification -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <span>🎨</span>
+                <span>Content Modification</span>
+            </h2>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="remove_ads" name="remove_ads" value="true"
+                           {% if config.remove_ads %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="remove_ads">Remove Ads</label>
+                        <div class="form-help">Strip advertising from proxied content</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="inject_ads" name="inject_ads" value="true"
+                           {% if config.inject_ads %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="inject_ads">Inject Custom Ads</label>
+                        <div class="form-help">Insert custom advertising code</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="remove_analytics" name="remove_analytics" value="true"
+                           {% if config.remove_analytics %}checked{% endif %}>
+                    <div class="checkbox-content">
+                        <label for="remove_analytics">Remove Analytics</label>
+                        <div class="form-help">Block tracking and analytics scripts</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label for="custom_ad_html">Custom Ad HTML</label>
+                    <textarea id="custom_ad_html" name="custom_ad_html" placeholder="<div>Your ad code here</div>">{% if config.custom_ad_html %}{{ config.custom_ad_html }}{% endif %}</textarea>
+                    <div class="form-help">HTML code for custom advertisements</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="custom_tracker_js">Custom Tracker JavaScript</label>
+                    <textarea id="custom_tracker_js" name="custom_tracker_js" placeholder="// Your tracking code here">{% if config.custom_tracker_js %}{{ config.custom_tracker_js }}{% endif %}</textarea>
+                    <div class="form-help">JavaScript code for custom tracking</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Settings -->
+        <div class="form-section">
+            <h2 class="form-section-title">
+                <span>⚡</span>
+                <span>Advanced Configuration</span>
+            </h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="media_policy">Media Policy</label>
+                    <select id="media_policy" name="media_policy" required>
+                        <option value="bypass" {% if config.media_policy == 'bypass' %}selected{% endif %}>Bypass - Direct links</option>
+                        <option value="proxy" {% if config.media_policy == 'proxy' %}selected{% endif %}>Proxy - Route through proxy</option>
+                        <option value="size_limited" {% if config.media_policy == 'size_limited' %}selected{% endif %}>Size Limited - Proxy with limits</option>
+                    </select>
+                    <div class="form-help">How to handle media files (images, videos)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="session_mode">Session Mode</label>
+                    <select id="session_mode" name="session_mode" required>
+                        <option value="stateless" {% if config.session_mode == 'stateless' %}selected{% endif %}>Stateless - No session persistence</option>
+                        <option value="cookie_jar" {% if config.session_mode == 'cookie_jar' %}selected{% endif %}>Cookie Jar - Maintain sessions</option>
+                    </select>
+                    <div class="form-help">Session and cookie handling mode</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Save Global Settings
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
